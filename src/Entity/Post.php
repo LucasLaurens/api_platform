@@ -4,15 +4,17 @@ namespace App\Entity;
 
 use App\Repository\PostRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Proxies\__CG__\App\Entity\Category;
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
  * @ApiResource(
+ *       attributes={"pagination_items_per_page"=2, "maximum_items_per_page"=2, "pagination_client_items_per_page"=true},
  *       normalizationContext={"groups"={"read:collection"}},
  *       denormalizationContext={"groups"={"write:Post"}},
  *       collectionOperations={
@@ -26,6 +28,9 @@ use Proxies\__CG__\App\Entity\Category;
  *              "normalization_context"={"groups"={"read:collection", "read:item", "read:Post"}}
  *          }
  *     }
+ * )
+ * @ApiFilter(
+ *     OrderFilter::class, properties={"id": "DESC", "title": "DESC"}, arguments={"orderParameterName"="order"}
  * )
  */
 class Post
