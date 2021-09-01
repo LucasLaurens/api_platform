@@ -7,6 +7,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,7 +26,8 @@ class Category
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:Post"})
+     * @Groups({"read:Post", "write:Post"})
+     * @Assert\Length(min = 3)
      */
     private $name;
 

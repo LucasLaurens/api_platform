@@ -4,15 +4,21 @@ namespace App\Entity;
 
 use App\Repository\PostRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Proxies\__CG__\App\Entity\Category;
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
  * @ApiResource(
  *       normalizationContext={"groups"={"read:collection"}},
  *       denormalizationContext={"groups"={"write:Post"}},
+ *       collectionOperations={
+ *          "get",
+ *          "post"
+ *       },
  *       itemOperations={
  *         "put",
  *         "delete",
@@ -35,6 +41,7 @@ class Post
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read:collection", "write:Post"})
+     * @Assert\Length(min = 5)
      */
     private $title;
 
@@ -62,8 +69,9 @@ class Post
     private $updatedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts")
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts", cascade={"persist"})
      * @Groups({"read:item", "write:Post"})
+     * @Assert\Valid
      */
     private $category;
 
@@ -149,4 +157,12 @@ class Post
 
         return $this;
     }
+
+    public static function validationGroups(self $post)
+    {
+        return [
+            'create:Post'
+        ];
+    }
+
 }
