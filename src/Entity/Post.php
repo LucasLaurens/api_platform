@@ -2,30 +2,52 @@
 
 namespace App\Entity;
 
+use DateTime;
+
+use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PostRepository;
-use ApiPlatform\Core\Annotation\ApiResource;
+
+use App\Controller\PostCountController;
+use App\Controller\PostPublishController;
+
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiProperty;
+
+use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
-use DateTime;
-use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
  * @ApiResource(
  *       attributes={"pagination_items_per_page"=2, "maximum_items_per_page"=2, "pagination_client_items_per_page"=true},
- *       normalizationContext={"groups"={"read:collection"}},
+ *       normalizationContext={"groups"={"read:collection"}, "openapi_definition_name"="Collection"},
  *       denormalizationContext={"groups"={"write:Post"}},
  *       collectionOperations={
  *          "get",
- *          "post"
+ *          "post",
  *       },
  *       itemOperations={
  *         "put",
  *         "delete",
  *         "get"={
- *              "normalization_context"={"groups"={"read:collection", "read:item", "read:Post"}}
+ *              "normalization_context"={"groups"={"read:collection", "read:item", "read:Post"}, "openapi_definition_name"="Detail"}
+ *          },
+ *         "publish"={
+ *             "method": "POST",
+ *             "path": "/posts/{id}/publish",
+ *             "controller": PostPublishController::class,
+ *             "openapi_context"={
+ *                  "summary"="Permet de publier un article",
+ *                  "requestBody"={
+ *                      "content"={
+ *                          "application/json"={
+ *                              "schema"={}
+ *                          }
+ *                      }
+ *                  }
+ *             }
  *          }
  *     }
  * )
@@ -33,6 +55,49 @@ use Doctrine\ORM\Mapping as ORM;
  *     OrderFilter::class, properties={"id": "DESC", "title": "DESC"}, arguments={"orderParameterName"="order"}
  * )
  */
+
+ 
+#[ApiResource(
+    collectionOperations: [
+        'count' => [
+            'method' => 'GET',
+            'path'   => 'posts/count',
+            'controller' => PostCountController::class,
+            'read' => false,
+            'pagination_enabled' => false,
+            'filters' => [],
+            'openapi_context' => [
+                'summary' => 'Récupère le nombre total d\'articles',
+                'parameters' => [
+                    [
+                        'in' => 'query',
+                        'name' => 'online',
+                        'schema' => [
+                            'type' => 'integer',
+                            'maximum' => 1,
+                            'minimum' => 0
+                        ],
+                        'description' => 'Filtre les articles en ligne'
+                    ]
+                ],
+                'responses' => [
+                    '200' => [
+                        'description' => 'OK',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'exemple' => 3
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ]
+)]
+
 class Post
 {
     /**
@@ -79,6 +144,20 @@ class Post
      * @Assert\Valid
      */
     private $category;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": 0})
+     * @Groups({"read:collection"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="boolean",
+     *             "description"="En ligne ou pas ?"
+     *         }
+     *     }
+     * )
+     */
+    private $online = false;
 
     public function __construct()
     {
@@ -168,6 +247,18 @@ class Post
         return [
             'create:Post'
         ];
+    }
+
+    public function getOnline(): ?bool
+    {
+        return $this->online;
+    }
+
+    public function setOnline(bool $online): self
+    {
+        $this->online = $online;
+
+        return $this;
     }
 
 }
