@@ -4,10 +4,22 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Ramsey\Uuid\Uuid;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ApiResource(
-    itemOperations: ['get'],
-    collectionOperations: ['get'],
+    collectionOperations: ['get', 'post'],
+    itemOperations: [
+        'get',
+        'put' => [
+            'denormalization_context' => [
+                'groups' => 'put:Dependency'
+            ]
+        ],
+        'delete'
+    ],
     paginationEnabled: false
 )]
 class Dependency
@@ -20,7 +32,9 @@ class Dependency
 
     #[ApiProperty(
         description: 'Nom de la dépendance'
-    )]
+    ),
+    Length(min:2),
+    NotBlank()]
     private string $name;
 
     #[ApiProperty(
@@ -28,31 +42,57 @@ class Dependency
         openapiContext: [
             'exemple' => "5.2.*"
         ]
-    )]
+    ),
+    Length(min:2),
+    NotBlank(),
+    Groups(['put:Dependency'])]
     private string $version;
 
     public function __construct(
-        string $uuid,
         string $name,
         string $version
     ) {
-        $this->uuid = $uuid;
+        $this->uuid = Uuid::uuid5(Uuid::NAMESPACE_URL, $name)->toString();
         $this->name = $name;
         $this->version = $version;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getUuid(): string
     {
         return $this->uuid;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    /**
+     * Set the value of version
+     *
+     * @return  self
+     */ 
+    public function setVersion($version)
+    {
+        $this->version = $version;
+
+        return $this;
     }
 }
