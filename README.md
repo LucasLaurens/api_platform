@@ -8,3 +8,5 @@
 - Pagination and filters
 - Custom operation with PHP 8.0.10
 - Improve the documentation
+- DataProvider
+- DataPersister
