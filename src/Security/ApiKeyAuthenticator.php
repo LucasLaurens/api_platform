@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 
+// TODO: replace AbstractGuardAuthenticator by AbstractAuthenticator
 class ApiKeyAuthenticator extends AbstractGuardAuthenticator
 {
     public function start(Request $request, AuthenticationException $authException = null): Response
