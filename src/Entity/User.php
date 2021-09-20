@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Action\NotFoundAction;
-use Symfony\Component\Serializer\Annotation\Groups;
 use App\Controller\MeController;
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use ApiPlatform\Core\Action\NotFoundAction;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -35,14 +36,15 @@ use App\Controller\MeController;
             'controller' => MeController::class,
             'read' => false,
             'openapi_context' => [
-                'security' => ['cookieAuth' => ['']]
+                // 'security' => ['cookieAuth' => ['']]
+                'security' => [['bearerAuth' => ['']]]
             ]
         ]
     ],
     normalizationContext: ['groups' => ['read:User']]
 
 )]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
 {
     /**
      * @ORM\Id
@@ -73,6 +75,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -157,5 +166,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public static function createFromPayload($id, array $payload)
+    {
+        return (new User())->setId($id)->setEmail($payload['username'] ?? '');
     }
 }
