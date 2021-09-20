@@ -21,6 +21,11 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api_token_refresh:
+            pattern: ^/api/token/refresh
+            stateless: true
+            # refresh_jwt:
+            #     provider: gesdinet_jwt_refresh_token
         login:
             pattern: ^/api/login$
             stateless: true
