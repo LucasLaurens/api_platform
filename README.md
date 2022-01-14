@@ -15,3 +15,4 @@ php bin/console doctrine:migrations:migrate # run all migration to fill the data
 - Improve the documentation
 - DataProvider
 - DataPersister
+- Create a custom endpoint (without Entity) to post a log message
