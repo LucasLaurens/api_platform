@@ -1,2 +1,7 @@
 resources:
   App\Entity\Post: ~
+  App\Entity\Feedback:
+    collectionOperations:
+      get: ~
+    itemOperations:
+      get: ~
