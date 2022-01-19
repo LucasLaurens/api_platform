@@ -15,14 +15,14 @@ use App\Entity\Post;
 final class Feedback
 {
     // #[ApiProperty(identifier:true)] 
-    // private int $id;
+    private int $id;
     // #[ApiProperty(description: "This is a little feeback")] 
     // private string $description;
 
     public function __construct(int $id, string $description)
     {
         $this->id = $id;
-        $this->description = $description;
+        // $this->description = $description;
     }
 
     public function getId(): int

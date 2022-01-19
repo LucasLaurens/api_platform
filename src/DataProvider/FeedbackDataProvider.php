@@ -13,7 +13,7 @@ implements
     RestrictedDataProviderInterface, # manage the support to use it
     ItemDataProviderInterface
 {
-    private array $test = [];
+    private array $test = [1];
 
     public function __construct(private string $rootPath) {}
 
