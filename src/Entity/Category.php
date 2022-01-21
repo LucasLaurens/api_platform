@@ -20,7 +20,16 @@ use App\Repository\CategoryRepository;
  */
 
 #[ApiResource(
-    collectionOperations: ['get', 'post'],
+    collectionOperations: [
+        'get', 
+        'post',
+        'special' => [
+            'method' => 'POST',
+            'path' => '/categories/special',
+            'denormalization_context' => ['groups' => ['special:Category']],
+            'normalization_context' => ['groups' => ['special:Category']],
+        ]
+    ],
     itemOperations: ['put', 'patch', 'delete', 'get' => [
         'controller' => NotFoundAction::class,
         'openapi_context' => [
@@ -42,7 +51,7 @@ class Category
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:Post", "write:Post"})
+     * @Groups({"read:Post", "write:Post", "special:Category"})
      * @Assert\Length(min = 3)
      */
     private $name;
