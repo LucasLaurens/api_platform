@@ -23,12 +23,15 @@ ContextAwareDataPersisterInterface
     public function persist($data, array $context = [])
     {
         if (self::DEFAULT_STRING === $data->getName()) {
-            $data->setName("Magic persist !");
-            $this->em->persist($data);
-            $this->em->flush();
+            $data->setName("Magic persist: " . $data->getName());
         }
 
-        return $data;
+        $this->em->persist($data);
+        $this->em->flush();
+
+        return  [
+            "success" => $data
+        ];
     }
 
     public function remove($data, array $context = [])

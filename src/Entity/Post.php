@@ -58,7 +58,12 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
  
 #[ApiResource(
+    // attributes: ["pagination_enabled" => true, "pagination_items_per_page"=2, "maximum_items_per_page"=2, "pagination_client_items_per_page"=true],
     collectionOperations: [
+        // 'get' => [
+            // 'pagination_enabled' => true,
+            // 'pagination_maximum_items_per_page' => 1,
+        // ],
         'count' => [
             'method' => 'GET',
             'path'   => 'posts/count',

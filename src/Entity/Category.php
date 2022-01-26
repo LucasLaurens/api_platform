@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiProperty;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,7 +22,14 @@ use App\Repository\CategoryRepository;
 
 #[ApiResource(
     collectionOperations: [
-        'get', 
+        'get' => [
+            "pagination_enabled" => true, 
+            "pagination_client_items_per_page"=>true,
+            "pagination_items_per_page"=>1, 
+            "maximum_items_per_page"=>5, 
+            // 'pagination_enabled' => true,
+            // 'pagination_maximum_items_per_page' => 1,
+        ], 
         'post',
         'special' => [
             'method' => 'POST',
@@ -45,8 +53,9 @@ class Category
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read:Post"})
+     * @Groups({"read:Post", "special:Category"})
      */
+    #[ApiProperty(identifier: true)]
     private $id;
 
     /**
